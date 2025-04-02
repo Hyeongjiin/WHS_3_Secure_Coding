@@ -109,17 +109,25 @@ def login():
         password = request.form['password']
         db = get_db()
         cursor = db.cursor()
-        cursor.execute("SELECT * FROM user WHERE username = ? AND password = ?", (username, password))
+        # username으로만 조회 (password는 해시로 비교할 것이므로 쿼리에 포함시키지 않음)
+        cursor.execute("SELECT * FROM user WHERE username = ?", (username,))
         user = cursor.fetchone()
+        
         if user:
-            if user['is_blocked']:
-                flash('이 계정은 차단되어 로그인할 수 없습니다.')
+            # 저장된 해시된 비밀번호와 입력된 비밀번호 비교
+            stored_hashed_password = user['password']  # 데이터베이스에서 가져온 해시
+            if bcrypt.checkpw(password.encode('utf-8'), stored_hashed_password):
+                if user['is_blocked']:
+                    flash('이 계정은 차단되어 로그인할 수 없습니다.')
+                    return redirect(url_for('login'))
+                session['user_id'] = user['id']
+                flash('로그인 성공!')
+                if user['role'] == 'admin':
+                    return redirect(url_for('admin_page'))
+                return redirect(url_for('dashboard'))
+            else:
+                flash('아이디 또는 비밀번호가 올바르지 않습니다.')
                 return redirect(url_for('login'))
-            session['user_id'] = user['id']
-            flash('로그인 성공!')
-            if user['role'] == 'admin':
-                return redirect(url_for('admin_page'))
-            return redirect(url_for('dashboard'))
         else:
             flash('아이디 또는 비밀번호가 올바르지 않습니다.')
             return redirect(url_for('login'))
@@ -479,10 +487,11 @@ def create_admin():
         cursor.execute("SELECT * FROM user WHERE username = 'admin'")
         if not cursor.fetchone():
             admin_id = str(uuid.uuid4())
+            # 비밀번호를 bcrypt로 해시
+            hashed_password = bcrypt.hashpw('admin'.encode('utf-8'), bcrypt.gensalt())
             cursor.execute("INSERT INTO user (id, username, password, bio, role) VALUES (?, ?, ?, ?, ?)",
-                           (admin_id, 'admin', 'admin', 'admin', 'admin'))
+                           (admin_id, 'admin', hashed_password, 'admin', 'admin'))
             db.commit()
-
 # 실시간 채팅: 클라이언트가 메시지를 보내면 전체 브로드캐스트
 @socketio.on('send_message')
 def handle_send_message_event(data):
