@@ -492,6 +492,7 @@ def create_admin():
             cursor.execute("INSERT INTO user (id, username, password, bio, role) VALUES (?, ?, ?, ?, ?)",
                            (admin_id, 'admin', hashed_password, 'admin', 'admin'))
             db.commit()
+            
 # 실시간 채팅: 클라이언트가 메시지를 보내면 전체 브로드캐스트
 @socketio.on('send_message')
 def handle_send_message_event(data):
