@@ -89,8 +89,11 @@
   <nav>
     {% if session.get('user_id') %}
       <a href="{{ url_for('dashboard') }}">대시보드</a>
-      <a href="{{ url_for('profile') }}">프로필</a>
+      <a href="{{ url_for('profile', user_id=session.user_id) }}">프로필</a>
       <a href="{{ url_for('report') }}">신고하기</a>
+      {% if is_admin(session.user_id) %}
+        <a href="{{ url_for('admin_page') }}">관리자 페이지</a>
+      {% endif %}
       <a href="{{ url_for('logout') }}">로그아웃</a>
     {% else %}
       <a href="{{ url_for('login') }}">로그인</a>

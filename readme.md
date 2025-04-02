@@ -1,16 +1,13 @@
-# Secure Coding
+# WHS-3-Secure Coding 
 
-## Tiny Secondhand Shopping Platform.
 
-You should add some functions and complete the security requirements.
 
 ## requirements
 
 if you don't have a miniconda(or anaconda), you can install it on this url. - https://docs.anaconda.com/free/miniconda/index.html
 
 ```
-git clone https://github.com/ugonfor/secure-coding
-conda env create -f enviroments.yaml
+git clone https://github.com/Hyeongjiin/WHS_3_Secure_Coding.git
 ```
 
 ## usage
@@ -18,12 +15,7 @@ conda env create -f enviroments.yaml
 run the server process.
 
 ```
+conda env create -f enviroments.yaml
+conda activate secure_coding
 python app.py
-```
-
-if you want to test on external machine, you can utilize the ngrok to forwarding the url.
-```
-# optional
-sudo snap install ngrok
-ngrok http 5000
 ```
